@@ -4,77 +4,57 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jebi.jebi.model.Note
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesScreen(onLogout: () -> Unit) {
 
+    var noteText by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf(listOf<Note>()) }
-    var text by remember { mutableStateOf("") }
-    var selectedIndex by remember { mutableIntStateOf(-1) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Notes") },
-                actions = {
-                    IconButton(onClick = { onLogout() }) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
-                    }
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Notes", style = MaterialTheme.typography.headlineMedium)
+
+                IconButton(onClick = onLogout) {
+                    Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
                 }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                if (text.isNotEmpty()) {
-                    if (selectedIndex >= 0) {
-                        notes = notes.toMutableList().also {
-                            it[selectedIndex] = Note(text)
-                        }
-                        selectedIndex = -1
-                    } else {
-                        notes = notes + Note(text)
-                    }
-                    text = ""
-                }
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
             }
-        }
-    ) { padding ->
 
-        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                label = { Text("Enter note") },
-                modifier = Modifier.fillMaxWidth()
+            TextField(
+                value = noteText,
+                onValueChange = { noteText = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Enter note") }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 itemsIndexed(notes) { index, note ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 6.dp)
+                            .padding(vertical = 8.dp)
                     ) {
                         Row(
                             modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .padding(16.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
 
@@ -82,24 +62,37 @@ fun NotesScreen(onLogout: () -> Unit) {
 
                             Row {
                                 IconButton(onClick = {
-                                    text = note.title
-                                    selectedIndex = index
+                                    noteText = note.title
                                 }) {
-                                    Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                    Icon(Icons.Default.Edit, "Edit")
                                 }
 
                                 IconButton(onClick = {
-                                    notes = notes.toMutableList().also {
-                                        it.removeAt(index)
+                                    notes = notes.toMutableList().apply {
+                                        removeAt(index)
                                     }
                                 }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                    Icon(Icons.Default.Delete, "Delete")
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = {
+                if (noteText.isNotEmpty()) {
+                    notes = notes + Note(notes.size, noteText)
+                    noteText = ""
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(Icons.Default.Add, "Add")
         }
     }
 }

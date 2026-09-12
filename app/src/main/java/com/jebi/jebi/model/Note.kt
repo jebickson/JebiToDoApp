@@ -1,5 +1,6 @@
 package com.jebi.jebi.model
 
 data class Note(
-    var title: String
+    val id: Int,
+    val title: String
 )
