@@ -26,6 +26,8 @@ class MainActivity : ComponentActivity() {
                     onLoginClick = { currentScreen = "login" }
                 )
 
+                //For coderabbit
+
                 "notes" -> NotesScreen()
             }
         }
