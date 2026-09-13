@@ -2,97 +2,54 @@ package com.jebi.jebi.ui.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.jebi.jebi.model.Note
+
+data class Note(val title: String, val desc: String)
 
 @Composable
-fun NotesScreen(onLogout: () -> Unit) {
+fun NotesScreen() {
 
-    var noteText by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf(listOf<Note>()) }
+    val notes = listOf(
+        Note("Design System Checklist", "Review UI components"),
+        Note("Grocery List", "Milk, Eggs, Bread"),
+        Note("App Ideas", "Build a notes app")
+    )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Notes", style = MaterialTheme.typography.headlineMedium)
-
-                IconButton(onClick = onLogout) {
-                    Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
-                }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {}) {
+                Text("+")
             }
+        }
+    ) { padding ->
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Column(modifier = Modifier.padding(padding)) {
 
-            TextField(
-                value = noteText,
-                onValueChange = { noteText = it },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Enter note") }
+            Text(
+                "Jebi",
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.headlineSmall
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                itemsIndexed(notes) { index, note ->
+            LazyColumn {
+                items(notes) { note ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp)
+                            .padding(10.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-
+                        Column(modifier = Modifier.padding(16.dp)) {
                             Text(note.title)
-
-                            Row {
-                                IconButton(onClick = {
-                                    noteText = note.title
-                                }) {
-                                    Icon(Icons.Default.Edit, "Edit")
-                                }
-
-                                IconButton(onClick = {
-                                    notes = notes.toMutableList().apply {
-                                        removeAt(index)
-                                    }
-                                }) {
-                                    Icon(Icons.Default.Delete, "Delete")
-                                }
-                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(note.desc)
                         }
                     }
                 }
             }
-        }
-
-        FloatingActionButton(
-            onClick = {
-                if (noteText.isNotEmpty()) {
-                    notes = notes + Note(notes.size, noteText)
-                    noteText = ""
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        ) {
-            Icon(Icons.Default.Add, "Add")
         }
     }
 }
